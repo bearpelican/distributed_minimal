@@ -16,13 +16,6 @@ parser.add_argument('--machines', type=int, default=2,
                     help="how many machines to use")
 args = parser.parse_args()
 
-def format_params(arg):
-  if isinstance(arg, list) or isinstance(arg, dict):
-    return '\"' + str(arg) + '\"'
-  else:
-    return str(arg)
-
-
 def main():
   supported_regions = ['us-east-1']
   assert ncluster.get_region() in supported_regions, f"required AMI {IMAGE_NAME} has only been made available in regions {supported_regions}, but your current region is {ncluster.get_region()}"
@@ -41,7 +34,7 @@ def main():
   # TODO: simplify args processing, or give link to actual commands run
   for i, task in enumerate(job.tasks):
     dist_params = f'--nproc_per_node={NUM_GPUS} --nnodes={args.machines} --node_rank={i} --master_addr={job.tasks[0].ip} --master_port={6006}'
-    cmd = f'{nccl_params} python -m torch.distributed.launch {dist_params} train_minimal'
+    cmd = f'{nccl_params} python -m torch.distributed.launch {dist_params} train_minimal.py'
     task.run(cmd, non_blocking=True)
 
 
